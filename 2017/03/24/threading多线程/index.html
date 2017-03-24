@@ -5,13 +5,19 @@
   
   <title>threading多线程 | 王辉的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="1.Thread创建线程：上代码：
+12345678910111213141516#!/usr/bin/env python3import threading import timedef A():    t_name = threading.current_thread().name #获取线程名称    for i in range(5):        print(i)        tim">
+<meta property="og:type" content="article">
 <meta property="og:title" content="threading多线程">
 <meta property="og:url" content="http://yoursite.com/2017/03/24/threading多线程/index.html">
 <meta property="og:site_name" content="王辉的博客">
-<meta property="og:updated_time" content="2017-03-24T07:31:31.109Z">
+<meta property="og:description" content="1.Thread创建线程：上代码：
+12345678910111213141516#!/usr/bin/env python3import threading import timedef A():    t_name = threading.current_thread().name #获取线程名称    for i in range(5):        print(i)        tim">
+<meta property="og:updated_time" content="2017-03-24T07:39:02.956Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="threading多线程">
+<meta name="twitter:description" content="1.Thread创建线程：上代码：
+12345678910111213141516#!/usr/bin/env python3import threading import timedef A():    t_name = threading.current_thread().name #获取线程名称    for i in range(5):        print(i)        tim">
   
     <link rel="alternate" href="/atom.xml" title="王辉的博客" type="application/atom+xml">
   
@@ -86,11 +92,42 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h3 id="1-Thread创建线程："><a href="#1-Thread创建线程：" class="headerlink" title="1.Thread创建线程："></a>1.Thread创建线程：</h3><p><strong>上代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python3</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> threading </div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">A</span><span class="params">()</span>:</span></div><div class="line">    t_name = threading.current_thread().name <span class="comment">#获取线程名称</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</div><div class="line">        print(i)</div><div class="line">        time.sleep(<span class="number">1</span>)</div><div class="line">    print(t_name)</div><div class="line"></div><div class="line"></div><div class="line">t1 = threading.Thread(target = A) <span class="comment">#创建线程对象</span></div><div class="line">t1.start() <span class="comment">#启动线程</span></div><div class="line">print(threading.current_thread().name)</div></pre></td></tr></table></figure>
+<p><strong>输出结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">0</div><div class="line">MainThread</div><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">Thread-1</div></pre></td></tr></table></figure>
+<ul>
+<li>一个进程最少且必须有一个线程，是主线程：MainThread，创建出来的是子线程，用Thread-1，Thread-2···命名</li>
+<li>主线程会等待子线程执行完毕之后才会结束</li>
+</ul>
+<hr>
+<h3 id="2-互斥锁-线程锁、全局变量锁-："><a href="#2-互斥锁-线程锁、全局变量锁-：" class="headerlink" title="2.互斥锁(线程锁、全局变量锁)："></a>2.互斥锁(线程锁、全局变量锁)：</h3><ul>
+<li>当多个线程同时对一个全局变量进行修改时会出现争抢，导致可能抢到的值是相同的，造成一些线程做了无用功。</li>
+</ul>
+<p><strong>上代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python3</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> threading </div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line">num = <span class="number">0</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">A</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> num</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1000000</span>):</div><div class="line">        num += <span class="number">1</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">B</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> num</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1000000</span>):</div><div class="line">        num += <span class="number">1</span></div><div class="line"></div><div class="line"></div><div class="line">t1 = threading.Thread(target = A)</div><div class="line">t1.start()</div><div class="line">t2 = threading.Thread(target = B)</div><div class="line">t2.start()</div><div class="line"></div><div class="line">t1.join()  <span class="comment">#等待线程执行完成后在往下执行</span></div><div class="line">t2.join()</div><div class="line">print(num)</div></pre></td></tr></table></figure>
+<p><strong>执行结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1924932</div></pre></td></tr></table></figure>
+<ul>
+<li>按理说结果应该是2000000才对，可是由于线程之间的对全局变量的争抢，导致了值得不稳定。所以要对全局变量每次操作时进行加锁，避免其混乱。</li>
+</ul>
+<p><strong>改进版：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python3</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> threading </div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line">num = <span class="number">0</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">A</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> num</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1000000</span>):</div><div class="line">        lock.acquire() <span class="comment">#加锁</span></div><div class="line">        num += <span class="number">1</span></div><div class="line">        lock.release() <span class="comment">#解锁</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">B</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> num</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1000000</span>):</div><div class="line">        lock.acquire() <span class="comment">#加锁</span></div><div class="line">        num += <span class="number">1</span></div><div class="line">        lock.release() <span class="comment">#解锁</span></div><div class="line"></div><div class="line">lock = threading.Lock()  <span class="comment">#创建锁</span></div><div class="line">t1 = threading.Thread(target = A)</div><div class="line">t1.start()</div><div class="line">t2 = threading.Thread(target = B)</div><div class="line">t2.start()</div><div class="line"></div><div class="line">t1.join()  <span class="comment">#等待线程执行完成后在往下执行</span></div><div class="line">t2.join()</div><div class="line">print(num)</div></pre></td></tr></table></figure>
+<p><strong>执行结果：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">2000000</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="3-进程与线程的区别"><a href="#3-进程与线程的区别" class="headerlink" title="3.进程与线程的区别"></a>3.进程与线程的区别</h3><ul>
+<li>每个程序都有至少一个进程，每个进程都有至少一个线程。</li>
+<li>线程依附于进程，不能独立存在</li>
+<li>进程与进程直接的内存资源不能共享，只能通过特殊渠道才能通信，如Queue。但是同一进程内的所有线程是可以资源共享的。</li>
+<li>进程消耗的资源多，线程消耗资源少。</li>
+</ul>
+<hr>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/03/24/threading多线程/" data-id="cj0niie1e0003k0jxjpybmhs8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/03/24/threading多线程/" data-id="cj0nin27m0002l7jxa9d35j3v" class="article-share-link">Share</a>
       
       
     </footer>
@@ -100,9 +137,9 @@
 <nav id="article-nav">
   
   
-    <a href="/2017/03/24/Python进程间通信Queue/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/03/24/Python的多进程/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Python进程间通信Queue</div>
+      <div class="article-nav-title">Python的多进程</div>
     </a>
   
 </nav>
@@ -140,10 +177,6 @@
         
           <li>
             <a href="/2017/03/24/threading多线程/">threading多线程</a>
-          </li>
-        
-          <li>
-            <a href="/2017/03/24/Python进程间通信Queue/">Python进程间通信Queue</a>
           </li>
         
           <li>
